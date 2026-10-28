@@ -644,6 +644,8 @@ function DebtRepaymentPlanner() {
     const [editingDebt, setEditingDebt] = useState(null);
     const [showStrategyInfo, setShowStrategyInfo] = useState(false);
     const [toast, setToast] = useState(null);
+    const [listOrder, setListOrder] = useState("date"); // "date" = 支払日が近い順 / "priority" = 優先順位
+    const [nextDateAsk, setNextDateAsk] = useState(null); // 返済後に「次回の支払日」を聞く画面
     const [motivationIdx, setMotivationIdx] = useState(() => Math.floor(Math.random() * MOTIVATIONS.length));
     const [conn, setConn] = useState(GAS_URL ? (getPass() ? "loading" : "needsPass") : "needsUrl");
     const [connError, setConnError] = useState("");
@@ -958,6 +960,15 @@ function DebtRepaymentPlanner() {
                 nextDueDate: d.nextDueDate ? addOneMonth(d.nextDueDate) : "",
             }
             : d));
+        if (!cleared) {
+            // 返済のあと、次回の支払日を決める画面を出す(初期値は翌月の同じ日)
+            setNextDateAsk({
+                id,
+                name: target.name,
+                hadDate: !!target.nextDueDate,
+                date: addOneMonth(target.nextDueDate || toISODate(new Date())),
+            });
+        }
         callApi("log", {
             entry: { name: target.name, amount: paid, balanceAfter: Math.max(0, target.balance - paid) },
         }).catch(() => { });
@@ -969,6 +980,29 @@ function DebtRepaymentPlanner() {
         setShowForm(false);
         setEditingDebt(null);
     };
+    // 次回の支払日を決定する
+    const confirmNextDate = () => {
+        if (!nextDateAsk || !nextDateAsk.date)
+            return;
+        const { id, date } = nextDateAsk;
+        setDebts((prev) => prev.map((d) => (d.id === id ? { ...d, nextDueDate: date } : d)));
+        setNextDateAsk(null);
+        setToast({ type: "pay", text: `次回は ${formatDate(date)} に登録しました。` });
+    };
+    // 並び順: 支払日が近い順(日付なしは最後)。同じ日は優先順位の高い方が先
+    const rankById = {};
+    orderedDebts.forEach((d, i) => {
+        rankById[d.id] = i + 1;
+    });
+    const displayDebts = listOrder === "priority"
+        ? orderedDebts
+        : [...orderedDebts].sort((a, b) => {
+            const ad = a.nextDueDate || "9999-12-31";
+            const bd = b.nextDueDate || "9999-12-31";
+            if (ad !== bd)
+                return ad < bd ? -1 : 1;
+            return rankById[a.id] - rankById[b.id];
+        });
     if (conn !== "ready") {
         return (React.createElement(GateScreen, { conn: conn, error: connError, onSubmitPass: (p) => {
                 setPass(p);
@@ -1028,14 +1062,22 @@ function DebtRepaymentPlanner() {
                     React.createElement(Plus, { size: 18 }),
                     " \u306F\u3058\u3081\u308B"))) : (React.createElement(React.Fragment, null,
                 React.createElement("div", { className: "flex items-center justify-between mb-3" },
-                    React.createElement("h2", { className: "text-base font-bold" }, "\u8FD4\u6E08\u306E\u512A\u5148\u9806\u4F4D"),
+                    React.createElement("h2", { className: "text-base font-bold" }, listOrder === "date" ? "支払日が近い順" : "返済の優先順位"),
                     React.createElement("button", { onClick: () => {
                             setEditingDebt(null);
                             setShowForm(true);
                         }, className: "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-[color:var(--card)] text-[color:var(--coral-ink)] shadow-sm hover:bg-[color:var(--cream2)]" },
                         React.createElement(Plus, { size: 14 }),
                         " \u8FFD\u52A0")),
-                orderedDebts.length > 0 ? (React.createElement("div", { className: "space-y-3 mb-6" }, orderedDebts.map((debt, i) => (React.createElement(DebtCard, { key: debt.id, debt: debt, order: i + 1, payoffMonth: sim.payoffMonth[debt.id], onEdit: (d) => {
+                orderedDebts.length > 1 && (React.createElement("div", { className: "mb-3" },
+                    React.createElement("div", { className: "inline-flex rounded-full bg-[color:var(--card)] p-1 shadow-sm" }, [
+                        ["date", "支払日順"],
+                        ["priority", "優先順位順"],
+                    ].map(([key, label]) => (React.createElement("button", { key: key, onClick: () => setListOrder(key), "aria-pressed": listOrder === key, className: `px-3.5 py-1.5 rounded-full text-xs font-medium ${listOrder === key
+                            ? "bg-[color:var(--coral)] text-[color:var(--on-accent)]"
+                            : "text-[color:var(--muted)] hover:bg-[color:var(--cream2)]"}` }, label)))),
+                    React.createElement("p", { className: "text-xs text-[color:var(--muted)] mt-1.5" }, "\u4E38\u306E\u6570\u5B57\u306F\u3001\u591A\u3081\u306B\u8FD4\u3057\u3066\u3044\u304F\u9806\u756A(\u512A\u5148\u9806\u4F4D)\u3067\u3059\u3002"))),
+                orderedDebts.length > 0 ? (React.createElement("div", { className: "space-y-3 mb-6" }, displayDebts.map((debt) => (React.createElement(DebtCard, { key: debt.id, debt: debt, order: rankById[debt.id], payoffMonth: sim.payoffMonth[debt.id], onEdit: (d) => {
                         setEditingDebt(d);
                         setShowForm(true);
                     }, onDelete: deleteDebt, onPay: payDebt }))))) : (React.createElement("div", { className: "bg-[color:var(--card)] rounded-2xl p-6 text-center mb-6" },
@@ -1205,6 +1247,24 @@ function DebtRepaymentPlanner() {
                     React.createElement("button", { onClick: closeForm, className: "p-1.5 rounded-full text-[color:var(--muted)] hover:bg-[color:var(--grey-bg)]", "aria-label": "\u9589\u3058\u308B" },
                         React.createElement(X, { size: 18 }))),
                 React.createElement(DebtForm, { initial: editingDebt, onSave: saveDebt, onCancel: closeForm })))),
+        nextDateAsk && (React.createElement("div", { className: "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4", onClick: () => setNextDateAsk(null) },
+            React.createElement("div", { role: "dialog", "aria-label": "\u6B21\u56DE\u306E\u652F\u6255\u65E5\u3092\u767B\u9332", className: "w-full max-w-sm bg-[color:var(--card)] rounded-3xl p-5 shadow-2xl", onClick: (e) => e.stopPropagation() },
+                React.createElement("div", { className: "flex items-center gap-2 mb-1" },
+                    React.createElement("div", { className: "w-9 h-9 rounded-full bg-[color:var(--mint-bg)] text-[color:var(--mint-ink)] flex items-center justify-center" },
+                        React.createElement(Check, { size: 18 })),
+                    React.createElement("p", { className: "text-base font-bold" }, "\u8FD4\u6E08\u3092\u8A18\u9332\u3057\u307E\u3057\u305F")),
+                React.createElement("p", { className: "text-sm text-[color:var(--muted)] mt-2 mb-4 leading-relaxed" },
+                    "\u300C",
+                    nextDateAsk.name,
+                    "\u300D\u306E\u3001\u6B21\u56DE\u306E\u652F\u6255\u65E5\u3092\u6C7A\u3081\u307E\u3057\u3087\u3046\u3002",
+                    React.createElement("br", null),
+                    React.createElement("span", { className: "text-xs text-[color:var(--muted)]" }, nextDateAsk.hadDate
+                        ? "翌月の同じ日を入れてあります。違う日なら選び直してください。"
+                        : "日付を入れておくと、支払い忘れを防げます。")),
+                React.createElement(CalendarDatePicker, { value: nextDateAsk.date, onChange: (v) => setNextDateAsk((a) => (a ? { ...a, date: v } : a)) }),
+                React.createElement("div", { className: "flex gap-2 mt-5" },
+                    React.createElement("button", { onClick: confirmNextDate, disabled: !nextDateAsk.date, className: "flex-1 py-3 rounded-full text-sm font-medium bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] shadow-sm disabled:opacity-50" }, "\u3053\u306E\u65E5\u3067\u767B\u9332"),
+                    React.createElement("button", { onClick: () => setNextDateAsk(null), className: "px-4 py-3 rounded-full text-sm font-medium bg-[color:var(--grey-bg)] text-[color:var(--muted)]" }, nextDateAsk.hadDate ? "そのまま" : "あとで"))))),
         toast && (React.createElement("div", { className: "fixed bottom-6 left-0 right-0 z-[70] flex justify-center pointer-events-none", style: { paddingLeft: "max(16px, env(safe-area-inset-left, 0px))", paddingRight: "max(16px, env(safe-area-inset-right, 0px))", paddingBottom: "env(safe-area-inset-bottom, 0px)" } },
             React.createElement("div", { className: `pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-[color:var(--on-accent)] shadow-lg ${toast.type === "clear" ? "bg-[color:var(--coral)]" : "bg-[color:var(--mint)]"}` },
                 toast.type === "clear" ? (React.createElement(PartyPopper, { size: 18 })) : (React.createElement(Check, { size: 18 })),
