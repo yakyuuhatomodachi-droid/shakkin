@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#FFF6E8">
+<title>返済ロードマップ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+<style>
+  /* 方針: 明るいクリーム地に、コーラルとミントを差す。丸ゴシックでやわらかく */
+  :root {
+    --bg1:#FFF6E8; --bg2:#FFEFE3; --bg3:#FFF9F2;
+    --ink:#4A3B47; --muted:#7D6B78; --faint:#968390;
+    --card:#FFFFFF; --card-soft:rgba(255,255,255,.7);
+    --line:#FFE3CC; --peach:#FFE9D6; --cream1:#FFF6E8; --cream2:#FFF1E6;
+    --coral:#FF7A59; --coral-hover:#FF6A45; --coral-ink:#C8401D;
+    --sun:#FFB347;
+    --mint:#2EC4A0; --mint-hover:#25B392; --mint-ink:#137A63; --mint-light:#7BE0C3; --mint-bg:#E8F8F3;
+    --sky:#4DA3FF; --sky-ink:#1F6FD1; --sky-bg:#EAF7FF; --violet:#B388FF;
+    --warn-bg:#FFF4D6; --warn-line:#FFD98A; --warn-ink:#8F5B00;
+    --danger:#C62F3B; --danger-bg:#FFE9E9; --grey-bg:#F4F0F6;
+    --on-accent:#3A2630;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg1:#211A25; --bg2:#271E2A; --bg3:#1C1620;
+      --ink:#F4EAF0; --muted:#BBA9B5; --faint:#8A7885;
+      --card:#2C2331; --card-soft:rgba(44,35,49,.7);
+      --line:#54404C; --peach:#4C3B44; --cream1:#3A2F37; --cream2:#46353C;
+      --coral:#FF8A6B; --coral-hover:#FF7A59; --coral-ink:#FF9C82;
+      --sun:#FFBE63;
+      --mint:#3DD1AD; --mint-hover:#2EC4A0; --mint-ink:#62E2C3; --mint-light:#6FE0C2; --mint-bg:#1F3A35;
+      --sky:#6DB5FF; --sky-ink:#86BEFF; --sky-bg:#213645; --violet:#C3A0FF;
+      --warn-bg:#4A4025; --warn-line:#7A6430; --warn-ink:#FFD071;
+      --danger:#FF8089; --danger-bg:#4E2B32; --grey-bg:#3B3141;
+      --on-accent:#2A1B24;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg1:#211A25; --bg2:#271E2A; --bg3:#1C1620;
+    --ink:#F4EAF0; --muted:#BBA9B5; --faint:#8A7885;
+    --card:#2C2331; --card-soft:rgba(44,35,49,.7);
+    --line:#54404C; --peach:#4C3B44; --cream1:#3A2F37; --cream2:#46353C;
+    --coral:#FF8A6B; --coral-hover:#FF7A59; --coral-ink:#FF9C82;
+    --sun:#FFBE63;
+    --mint:#3DD1AD; --mint-hover:#2EC4A0; --mint-ink:#62E2C3; --mint-light:#6FE0C2; --mint-bg:#1F3A35;
+    --sky:#6DB5FF; --sky-ink:#86BEFF; --sky-bg:#213645; --violet:#C3A0FF;
+    --warn-bg:#4A4025; --warn-line:#7A6430; --warn-ink:#FFD071;
+    --danger:#FF8089; --danger-bg:#4E2B32; --grey-bg:#3B3141;
+    --on-accent:#2A1B24;
+    color-scheme: dark;
+  }
+  body {
+    margin: 0;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--bg3) linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 100%) no-repeat;
+    min-height: 100vh;
+  }
+  button, input, select { font-family: inherit; }
+  :focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ★ここだけ書き換えてください: Apps ScriptのウェブアプリのURL(https://script.google.com/macros/s/.../exec)
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyJIcBURlC0oFd7H1OkHsRSyXDg1vOqzU7DqhN8i-uaVwJa8UwgeqFIeEI1Qsm-EaY8Jg/exec";
+</script>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+"use strict";
+const { useState, useEffect, useMemo, useRef } = React;
+const mkIcon = (paths) => ({ size = 16, className = "" }) => (React.createElement("svg", { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: className, "aria-hidden": "true" }, paths.map((d, i) => React.createElement("path", { key: i, d: d }))));
+const Plus = mkIcon(["M5 12h14", "M12 5v14"]);
+const X = mkIcon(["M18 6 6 18", "M6 6l12 12"]);
+const Check = mkIcon(["M20 6 9 17l-5-5"]);
+const Calendar = mkIcon(["M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z", "M16 2v4", "M8 2v4", "M3 10h18"]);
+const Sparkles = mkIcon(["M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z", "M19 16v4", "M17 18h4"]);
+const PartyPopper = Sparkles;
+const Lightbulb = mkIcon(["M9 18h6", "M10 22h4", "M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2z"]);
+const Info = mkIcon(["M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z", "M12 16v-4", "M12 8h.01"]);
+const RefreshCw = mkIcon(["M21 12a9 9 0 0 0-15-6.7L3 8", "M3 3v5h5", "M3 12a9 9 0 0 0 15 6.7L21 16", "M16 16h5v5"]);
+const Bell = mkIcon(["M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9", "M10.3 21a1.94 1.94 0 0 0 3.4 0"]);
+const Pencil = mkIcon(["M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"]);
+const Trash2 = mkIcon(["M3 6h18", "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6", "M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", "M10 11v6", "M14 11v6"]);
+const Rocket = mkIcon(["M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z", "M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z", "M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0", "M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"]);
+/* ------------------------------------------------------------------ */
+/* 定数・ユーティリティ                                                */
+/* ------------------------------------------------------------------ */
+const SIM_CAP = 600;
+const PASS_KEY = "shakkin-pass";
+const getPass = () => { try {
+    return localStorage.getItem(PASS_KEY) || "";
+}
+catch (e) {
+    return "";
+} };
+const setPass = (p) => { try {
+    localStorage.setItem(PASS_KEY, p);
+}
+catch (e) { } };
+const clearPass = () => { try {
+    localStorage.removeItem(PASS_KEY);
+}
+catch (e) { } };
+// スプレッドシート(Apps Script)との通信。合言葉をつけてPOSTする
+async function callApi(action, payload) {
+    const res = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify(Object.assign({ action: action, pass: getPass() }, payload)),
+    });
+    return await res.json();
+}
+// バックアップの読み込み用: 中身をアプリが扱える形にそろえる
+function normalizeDebts(list) {
+    return (Array.isArray(list) ? list : []).map(function (d, i) {
+        const balance = Math.max(0, Number(d.balance) || 0);
+        const due = String(d.nextDueDate || "");
+        return {
+            id: d.id ? String(d.id) : "imp-" + Date.now() + "-" + i,
+            name: String(d.name || "名前なし"),
+            balance: balance,
+            startingBalance: Math.max(Number(d.startingBalance) || 0, balance),
+            apr: Math.max(0, Number(d.apr) || 0),
+            minPayment: Math.max(0, Number(d.minPayment) || 0),
+            nextDueDate: due.length === 10 && !isNaN(Date.parse(due)) ? due : "",
+            payMethod: String(d.payMethod || ""),
+            account: String(d.account || ""),
+        };
+    });
+}
+function normalizeSettings(st) {
+    st = st || {};
+    const num = function (v, def) { return v !== "" && v !== null && v !== undefined && Number.isFinite(Number(v)) ? Number(v) : def; };
+    return {
+        strategy: st.strategy === "snowball" ? "snowball" : "avalanche",
+        monthlyBudget: Math.max(0, num(st.monthlyBudget, 30000)),
+        bonusEnabled: st.bonusEnabled === true,
+        bonusAmount: Math.max(0, num(st.bonusAmount, 50000)),
+        bonusMonth1: Math.min(12, Math.max(1, num(st.bonusMonth1, 6))),
+        bonusMonth2: Math.min(12, Math.max(1, num(st.bonusMonth2, 12))),
+    };
+}
+const MOTIVATIONS = [
+    "今日の一歩が、未来のあなたを自由にする。",
+    "小さな返済も、ちゃんと前進です。",
+    "借金はゴールじゃなくて通過点。ゴールは自由な毎日。",
+    "焦らず、着実に。今日もえらい!",
+    "数字が減るたび、未来が広がっていく。",
+    "返済は、未来の自分へのプレゼント。",
+    "一歩ずつでいい。止まらなければ必ず着く。",
+    "完済の日を想像してみよう。きっと軽やか。",
+    "アプリを開いた時点で、もう一歩前進してる。",
+    "今日払った分、未来の自分がラクになる。",
+    "返済は戦いじゃなくて、積み重ね。",
+    "ここまで続けてきた自分を、ほめていい。",
+    "ゼロに近づく音が聞こえてくる。",
+    "コツコツは、いちばん強い。",
+    "できた日を数えよう。それが自信になる。",
+];
+const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+const yen = (n) => new Intl.NumberFormat("ja-JP", {
+    style: "currency",
+    currency: "JPY",
+    maximumFractionDigits: 0,
+}).format(Math.round(n || 0));
+const toISODate = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+};
+const parseISO = (s) => new Date(s + "T00:00:00");
+const formatDate = (s) => {
+    const d = parseISO(s);
+    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+};
+const daysUntil = (s) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((parseISO(s) - today) / 86400000);
+};
+// 月末をまたいでも日付が飛ばないように、翌月の末日で丸める
+const addOneMonth = (s) => {
+    const d = parseISO(s);
+    const day = d.getDate();
+    const next = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    const lastDay = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+    next.setDate(Math.min(day, lastDay));
+    return toISODate(next);
+};
+const monthsFromNow = (n) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + n);
+    return `${d.getFullYear()}年${d.getMonth() + 1}月`;
+};
+const payoffLabel = (months) => months >= SIM_CAP ? "50年以上先" : `${monthsFromNow(months)}ごろ`;
+const durationLabel = (months) => {
+    if (months >= SIM_CAP)
+        return "50年以上";
+    const y = Math.floor(months / 12);
+    const m = months % 12;
+    if (y === 0)
+        return `${m}ヶ月`;
+    if (m === 0)
+        return `${y}年`;
+    return `${y}年${m}ヶ月`;
+};
+const sortDebts = (debts, strategy) => {
+    const list = [...debts];
+    if (strategy === "snowball")
+        list.sort((a, b) => a.balance - b.balance);
+    else
+        list.sort((a, b) => b.apr - a.apr);
+    return list;
+};
+/* ------------------------------------------------------------------ */
+/* 返済シミュレーション                                                */
+/* ------------------------------------------------------------------ */
+function simulate(debts, strategy, monthlyBudget, bonus) {
+    const active = debts.filter((d) => d.balance > 0);
+    if (active.length === 0) {
+        return {
+            months: 0,
+            totalInterest: 0,
+            history: [{ month: 0, balance: 0 }],
+            payoffMonth: {},
+            minSum: 0,
+            shortfall: false,
+            totalBonusPaid: 0,
+        };
+    }
+    const priority = sortDebts(active, strategy).map((d) => d.id);
+    const minSum = active.reduce((s, d) => s + d.minPayment, 0);
+    const budget = Math.max(monthlyBudget, minSum);
+    const shortfall = monthlyBudget < minSum;
+    const bonusOn = bonus && bonus.enabled && bonus.amount > 0;
+    const bonusMonths = bonusOn ? bonus.months : [];
+    const bonusAmount = bonusOn ? bonus.amount : 0;
+    const startMonth = new Date().getMonth() + 1;
+    const balances = {};
+    const aprById = {};
+    const minById = {};
+    active.forEach((d) => {
+        balances[d.id] = d.balance;
+        aprById[d.id] = d.apr;
+        minById[d.id] = d.minPayment;
+    });
+    let totalInterest = 0;
+    let totalBonusPaid = 0;
+    let month = 0;
+    const history = [
+        { month: 0, balance: Object.values(balances).reduce((a, b) => a + b, 0) },
+    ];
+    const payoffMonth = {};
+    while (Object.values(balances).some((b) => b > 0.5) && month < SIM_CAP) {
+        month += 1;
+        const calendarMonth = ((startMonth - 1 + month) % 12) + 1;
+        const isBonusMonth = bonusMonths.includes(calendarMonth);
+        Object.keys(balances).forEach((id) => {
+            if (balances[id] > 0) {
+                const interest = (balances[id] * aprById[id]) / 100 / 12;
+                balances[id] += interest;
+                totalInterest += interest;
+            }
+        });
+        let usedOnMin = 0;
+        Object.keys(balances).forEach((id) => {
+            if (balances[id] > 0) {
+                const pay = Math.min(minById[id], balances[id]);
+                balances[id] -= pay;
+                usedOnMin += pay;
+            }
+        });
+        let leftover = budget + (isBonusMonth ? bonusAmount : 0) - usedOnMin;
+        let bonusRemaining = isBonusMonth ? bonusAmount : 0;
+        for (const id of priority) {
+            if (leftover <= 0)
+                break;
+            if (balances[id] > 0) {
+                const pay = Math.min(leftover, balances[id]);
+                balances[id] -= pay;
+                leftover -= pay;
+                const used = Math.min(bonusRemaining, pay);
+                totalBonusPaid += used;
+                bonusRemaining -= used;
+            }
+        }
+        priority.forEach((id) => {
+            if (balances[id] <= 0.5 && payoffMonth[id] === undefined) {
+                payoffMonth[id] = month;
+            }
+        });
+        history.push({
+            month,
+            balance: Math.max(0, Object.values(balances).reduce((a, b) => a + b, 0)),
+        });
+    }
+    return {
+        months: month,
+        totalInterest,
+        history,
+        payoffMonth,
+        minSum,
+        shortfall,
+        totalBonusPaid,
+    };
+}
+/* ------------------------------------------------------------------ */
+/* 小さな部品                                                          */
+/* ------------------------------------------------------------------ */
+function ProgressRing({ percent, size = 132 }) {
+    const stroke = 14;
+    const r = (size - stroke) / 2;
+    const c = 2 * Math.PI * r;
+    const p = Math.min(100, Math.max(0, percent));
+    return (React.createElement("svg", { width: size, height: size, className: "shrink-0", role: "img", "aria-label": "返済済み " + Math.round(p) + "%" },
+        React.createElement("defs", null,
+            React.createElement("linearGradient", { id: "ringGrad", x1: "0", y1: "0", x2: "1", y2: "1" },
+                React.createElement("stop", { offset: "0%", style: { stopColor: "var(--sun)" } }),
+                React.createElement("stop", { offset: "100%", style: { stopColor: "var(--coral)" } }))),
+        React.createElement("circle", { cx: size / 2, cy: size / 2, r: r, fill: "none", style: { stroke: "var(--peach)" }, strokeWidth: stroke }),
+        React.createElement("circle", { cx: size / 2, cy: size / 2, r: r, fill: "none", stroke: "url(#ringGrad)", strokeWidth: stroke, strokeLinecap: "round", strokeDasharray: c, strokeDashoffset: c * (1 - p / 100), opacity: p > 0 ? 1 : 0, transform: "rotate(-90 " + size / 2 + " " + size / 2 + ")", style: { transition: "stroke-dashoffset 0.8s ease" } }),
+        React.createElement("text", { x: "50%", y: "47%", textAnchor: "middle", dominantBaseline: "middle", fontSize: "28", fontWeight: "700", style: { fill: "var(--ink)" } },
+            Math.round(p),
+            "%"),
+        React.createElement("text", { x: "50%", y: "66%", textAnchor: "middle", dominantBaseline: "middle", fontSize: "11", style: { fill: "var(--muted)" } }, "\u8FD4\u6E08\u6E08\u307F")));
+}
+function TrendChart({ data }) {
+    const [hover, setHover] = useState(null);
+    const W = 360, H = 200, L = 46, R = 12, T = 12, B = 26;
+    const maxY = Math.max(...data.map((d) => d.balance), 1);
+    const maxX = Math.max(...data.map((d) => d.month), 1);
+    const x = (m) => L + (m / maxX) * (W - L - R);
+    const y = (v) => T + (1 - v / maxY) * (H - T - B);
+    const line = data
+        .map((d, i) => (i ? "L" : "M") + x(d.month).toFixed(1) + " " + y(d.balance).toFixed(1))
+        .join(" ");
+    const last = data[data.length - 1];
+    const area = line + " L" + x(last.month).toFixed(1) + " " + y(0).toFixed(1) + " L" + x(0).toFixed(1) + " " + y(0).toFixed(1) + " Z";
+    const yTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * maxY);
+    const xTicks = [0, 1, 2, 3, 4].map((i) => Math.round((maxX * i) / 4));
+    const fmtY = (v) => (v >= 10000 ? Math.round(v / 10000) + "万" : String(Math.round(v)));
+    const onMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const px = ((e.clientX - rect.left) / rect.width) * W;
+        const m = ((px - L) / (W - L - R)) * maxX;
+        let best = 0;
+        for (let i = 1; i < data.length; i++) {
+            if (Math.abs(data[i].month - m) < Math.abs(data[best].month - m))
+                best = i;
+        }
+        setHover(best);
+    };
+    const shown = hover !== null ? data[hover] : null;
+    return (React.createElement("div", null,
+        React.createElement("p", { className: "text-xs h-4 mb-1 text-[color:var(--muted)]" }, shown
+            ? shown.month + "ヶ月後(" + monthsFromNow(shown.month) + ")の残高 " + yen(shown.balance)
+            : "グラフをなぞると、その時点の残高が見られます"),
+        React.createElement("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", style: { display: "block", touchAction: "pan-y" }, onPointerMove: onMove, onPointerLeave: () => setHover(null), role: "img", "aria-label": "\u501F\u91D1\u6B8B\u9AD8\u306E\u63A8\u79FB\u30B0\u30E9\u30D5" },
+            React.createElement("defs", null,
+                React.createElement("linearGradient", { id: "areaGrad", x1: "0", y1: "0", x2: "0", y2: "1" },
+                    React.createElement("stop", { offset: "0%", style: { stopColor: "var(--coral)", stopOpacity: 0.35 } }),
+                    React.createElement("stop", { offset: "100%", style: { stopColor: "var(--sun)", stopOpacity: 0.03 } }))),
+            yTicks.map((v, i) => (React.createElement("g", { key: i },
+                React.createElement("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), strokeDasharray: "3 3", style: { stroke: "var(--peach)" } }),
+                React.createElement("text", { x: L - 6, y: y(v), textAnchor: "end", dominantBaseline: "middle", fontSize: "10", style: { fill: "var(--muted)" } }, fmtY(v))))),
+            xTicks.map((m, i) => (React.createElement("text", { key: i, x: x(m), y: H - 8, textAnchor: i === 0 ? "start" : i === 4 ? "end" : "middle", fontSize: "10", style: { fill: "var(--muted)" } },
+                m,
+                "\u30F6\u6708"))),
+            React.createElement("path", { d: area, fill: "url(#areaGrad)" }),
+            React.createElement("path", { d: line, fill: "none", strokeWidth: "3", strokeLinejoin: "round", strokeLinecap: "round", style: { stroke: "var(--coral)" } }),
+            React.createElement("circle", { cx: x(data[0].month), cy: y(data[0].balance), r: "4", style: { fill: "var(--coral)" } }),
+            shown && (React.createElement("g", null,
+                React.createElement("line", { x1: x(shown.month), x2: x(shown.month), y1: T, y2: H - B, style: { stroke: "var(--muted)", opacity: 0.5 } }),
+                React.createElement("circle", { cx: x(shown.month), cy: y(shown.balance), r: "5", strokeWidth: "2", style: { fill: "var(--card)", stroke: "var(--coral)" } }))))));
+}
+function CalendarDatePicker({ value, onChange }) {
+    const [open, setOpen] = useState(false);
+    const base = value ? parseISO(value) : new Date();
+    const [viewYear, setViewYear] = useState(base.getFullYear());
+    const [viewMonth, setViewMonth] = useState(base.getMonth());
+    const openPicker = () => {
+        const b = value ? parseISO(value) : new Date();
+        setViewYear(b.getFullYear());
+        setViewMonth(b.getMonth());
+        setOpen(true);
+    };
+    const changeMonth = (delta) => {
+        let m = viewMonth + delta;
+        let y = viewYear;
+        if (m < 0) {
+            m = 11;
+            y -= 1;
+        }
+        else if (m > 11) {
+            m = 0;
+            y += 1;
+        }
+        setViewMonth(m);
+        setViewYear(y);
+    };
+    const startOffset = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const todayISO = toISODate(new Date());
+    const cells = [];
+    for (let i = 0; i < startOffset; i++)
+        cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++)
+        cells.push(d);
+    return (React.createElement("div", null,
+        React.createElement("button", { type: "button", onClick: openPicker, className: "w-full flex items-center justify-between bg-[color:var(--card)] border-2 border-[color:var(--line)] rounded-xl px-3 py-2.5 text-sm text-left focus:outline-none focus:border-[color:var(--coral)]" },
+            React.createElement("span", { className: value ? "text-[color:var(--ink)]" : "text-[color:var(--muted)]" }, value ? formatDate(value) : "日付を選ぶ"),
+            React.createElement(Calendar, { size: 16, className: "text-[color:var(--coral-ink)] shrink-0" })),
+        open && (React.createElement("div", { className: "fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-4", onClick: () => setOpen(false) },
+            React.createElement("div", { className: "w-72 bg-[color:var(--card)] rounded-2xl p-4 shadow-xl", onClick: (e) => e.stopPropagation() },
+                React.createElement("div", { className: "flex items-center justify-between mb-2" },
+                    React.createElement("button", { type: "button", onClick: () => changeMonth(-1), className: "w-8 h-8 rounded-full text-[color:var(--coral-ink)] hover:bg-[color:var(--cream2)] text-lg", "aria-label": "\u524D\u306E\u6708" }, "\u2039"),
+                    React.createElement("p", { className: "text-sm font-medium text-[color:var(--ink)]" },
+                        viewYear,
+                        "\u5E74",
+                        viewMonth + 1,
+                        "\u6708"),
+                    React.createElement("button", { type: "button", onClick: () => changeMonth(1), className: "w-8 h-8 rounded-full text-[color:var(--coral-ink)] hover:bg-[color:var(--cream2)] text-lg", "aria-label": "\u6B21\u306E\u6708" }, "\u203A")),
+                React.createElement("div", { className: "grid grid-cols-7 gap-1 mb-1" }, WEEKDAYS.map((w, i) => (React.createElement("div", { key: w, className: `text-center text-xs py-1 ${i === 0
+                        ? "text-[color:var(--coral-ink)]"
+                        : i === 6
+                            ? "text-[color:var(--sky-ink)]"
+                            : "text-[color:var(--muted)]"}` }, w)))),
+                React.createElement("div", { className: "grid grid-cols-7 gap-1" }, cells.map((d, i) => {
+                    if (d === null)
+                        return React.createElement("div", { key: i });
+                    const iso = toISODate(new Date(viewYear, viewMonth, d));
+                    const selected = iso === value;
+                    const isToday = iso === todayISO;
+                    return (React.createElement("button", { type: "button", key: i, onClick: () => {
+                            onChange(iso);
+                            setOpen(false);
+                        }, className: `text-sm rounded-full aspect-square flex items-center justify-center ${selected
+                            ? "bg-[color:var(--coral)] text-[color:var(--on-accent)] font-medium"
+                            : isToday
+                                ? "border-2 border-[color:var(--sun)] text-[color:var(--ink)]"
+                                : "text-[color:var(--ink)] hover:bg-[color:var(--cream2)]"}` }, d));
+                })),
+                React.createElement("div", { className: "flex items-center justify-between mt-3" },
+                    value ? (React.createElement("button", { type: "button", onClick: () => {
+                            onChange("");
+                            setOpen(false);
+                        }, className: "text-xs text-[color:var(--muted)] hover:text-[color:var(--coral-ink)]" }, "\u65E5\u4ED8\u3092\u30AF\u30EA\u30A2")) : (React.createElement("span", null)),
+                    React.createElement("button", { type: "button", onClick: () => setOpen(false), className: "text-xs text-[color:var(--muted)] hover:text-[color:var(--ink)]" }, "\u9589\u3058\u308B")))))));
+}
+function Field({ label, children }) {
+    return (React.createElement("div", null,
+        React.createElement("label", { className: "block text-xs text-[color:var(--muted)] mb-1" }, label),
+        children));
+}
+const inputCls = "w-full bg-[color:var(--card)] border-2 border-[color:var(--line)] rounded-xl px-3 py-2.5 text-sm text-[color:var(--ink)] placeholder-[color:var(--faint)] focus:outline-none focus:border-[color:var(--coral)]";
+function DebtForm({ initial, onSave, onCancel }) {
+    var _a, _b, _c;
+    const [name, setName] = useState((initial === null || initial === void 0 ? void 0 : initial.name) || "");
+    const [balance, setBalance] = useState((_a = initial === null || initial === void 0 ? void 0 : initial.balance) !== null && _a !== void 0 ? _a : "");
+    const [apr, setApr] = useState((_b = initial === null || initial === void 0 ? void 0 : initial.apr) !== null && _b !== void 0 ? _b : "");
+    const [minPayment, setMinPayment] = useState((_c = initial === null || initial === void 0 ? void 0 : initial.minPayment) !== null && _c !== void 0 ? _c : "");
+    const [nextDueDate, setNextDueDate] = useState((initial === null || initial === void 0 ? void 0 : initial.nextDueDate) || "");
+    const [payMethod, setPayMethod] = useState((initial === null || initial === void 0 ? void 0 : initial.payMethod) || "");
+    const [account, setAccount] = useState((initial === null || initial === void 0 ? void 0 : initial.account) || "");
+    const [error, setError] = useState("");
+    const submit = () => {
+        var _a;
+        if (!name.trim())
+            return setError("名前を入力してください。");
+        const b = parseFloat(balance);
+        const a = parseFloat(apr);
+        const m = parseFloat(minPayment);
+        if (!(b > 0))
+            return setError("残高は0より大きい数字を入力してください。");
+        if (!(a >= 0))
+            return setError("年利を入力してください(0でもOK)。");
+        if (!(m >= 0))
+            return setError("毎月の返済額を入力してください。");
+        setError("");
+        onSave({
+            id: (initial === null || initial === void 0 ? void 0 : initial.id) || crypto.randomUUID(),
+            name: name.trim(),
+            balance: b,
+            startingBalance: Math.max((_a = initial === null || initial === void 0 ? void 0 : initial.startingBalance) !== null && _a !== void 0 ? _a : b, b),
+            apr: a,
+            minPayment: m,
+            nextDueDate: nextDueDate || "",
+            payMethod,
+            account: account.trim(),
+        });
+    };
+    return (React.createElement("div", { className: "space-y-3" },
+        React.createElement(Field, { label: "\u501F\u91D1\u306E\u540D\u524D" },
+            React.createElement("input", { value: name, onChange: (e) => setName(e.target.value), placeholder: "\u4F8B:\u30AB\u30FC\u30C9\u30ED\u30FC\u30F3A", className: inputCls })),
+        React.createElement("div", { className: "grid grid-cols-2 gap-3" },
+            React.createElement(Field, { label: "\u73FE\u5728\u306E\u6B8B\u9AD8(\u5186)" },
+                React.createElement("input", { type: "number", value: balance, onChange: (e) => setBalance(e.target.value), placeholder: "300000", className: inputCls })),
+            React.createElement(Field, { label: "\u5E74\u5229(%)" },
+                React.createElement("input", { type: "number", step: "0.1", value: apr, onChange: (e) => setApr(e.target.value), placeholder: "15.0", className: inputCls }))),
+        React.createElement(Field, { label: "\u6BCE\u6708\u306E\u8FD4\u6E08\u984D(\u6700\u4F4E\u984D)" },
+            React.createElement("input", { type: "number", value: minPayment, onChange: (e) => setMinPayment(e.target.value), placeholder: "10000", className: inputCls })),
+        React.createElement(Field, { label: "\u6B21\u56DE\u306E\u652F\u6255\u4E88\u5B9A\u65E5(\u4EFB\u610F)" },
+            React.createElement(CalendarDatePicker, { value: nextDueDate, onChange: setNextDueDate })),
+        React.createElement("div", { className: "grid grid-cols-2 gap-3" },
+            React.createElement(Field, { label: "\u652F\u6255\u3044\u65B9\u6CD5(\u4EFB\u610F)" },
+                React.createElement("select", { value: payMethod, onChange: (e) => setPayMethod(e.target.value), className: inputCls },
+                    React.createElement("option", { value: "" }, "\u672A\u8A2D\u5B9A"),
+                    React.createElement("option", { value: "\u5F15\u843D" }, "\u5F15\u843D"),
+                    React.createElement("option", { value: "\u632F\u8FBC" }, "\u632F\u8FBC"),
+                    React.createElement("option", { value: "\u305D\u306E\u4ED6" }, "\u305D\u306E\u4ED6"))),
+            React.createElement(Field, { label: "\u53E3\u5EA7(\u4EFB\u610F)" },
+                React.createElement("input", { value: account, onChange: (e) => setAccount(e.target.value), placeholder: "\u4F8B:UFJ", className: inputCls }))),
+        error && React.createElement("p", { className: "text-sm text-[color:var(--danger)]" }, error),
+        React.createElement("div", { className: "flex gap-2 justify-end pt-1" },
+            React.createElement("button", { onClick: onCancel, className: "px-4 py-2 rounded-full text-sm text-[color:var(--muted)] hover:bg-[color:var(--cream2)]" }, "\u30AD\u30E3\u30F3\u30BB\u30EB"),
+            React.createElement("button", { onClick: submit, className: "px-5 py-2 rounded-full text-sm font-medium bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] shadow-sm flex items-center gap-1" },
+                React.createElement(Check, { size: 15 }),
+                " \u4FDD\u5B58\u3059\u308B"))));
+}
+function DebtCard({ debt, order, payoffMonth, onEdit, onDelete, onPay }) {
+    const [paying, setPaying] = useState(false);
+    const [amount, setAmount] = useState("");
+    const progress = debt.startingBalance > 0
+        ? Math.min(100, Math.max(0, ((debt.startingBalance - debt.balance) / debt.startingBalance) * 100))
+        : 0;
+    const daysLeft = debt.nextDueDate ? daysUntil(debt.nextDueDate) : null;
+    const dueStatus = daysLeft === null
+        ? null
+        : daysLeft < 0
+            ? "overdue"
+            : daysLeft <= 3
+                ? "soon"
+                : "ok";
+    const badgeColors = ["var(--coral)", "var(--sun)", "var(--mint)", "var(--sky)", "var(--violet)"];
+    const badge = badgeColors[(order - 1) % badgeColors.length];
+    const openPay = () => {
+        setAmount(String(Math.min(debt.minPayment || 0, Math.round(debt.balance))));
+        setPaying(true);
+    };
+    const submitPay = () => {
+        const v = parseFloat(amount);
+        if (v > 0)
+            onPay(debt.id, v);
+        setPaying(false);
+        setAmount("");
+    };
+    return (React.createElement("div", { className: "bg-[color:var(--card)] rounded-2xl p-4 shadow-[0_4px_16px_rgba(255,122,89,0.10)]" },
+        React.createElement("div", { className: "flex items-start justify-between gap-3" },
+            React.createElement("div", { className: "flex items-start gap-3 min-w-0" },
+                React.createElement("div", { className: "shrink-0 w-8 h-8 rounded-full text-[color:var(--on-accent)] text-sm font-bold flex items-center justify-center", style: { background: badge } }, order),
+                React.createElement("div", { className: "min-w-0" },
+                    React.createElement("p", { className: "font-medium text-[color:var(--ink)] truncate" }, debt.name),
+                    React.createElement("p", { className: "text-xs text-[color:var(--muted)] mt-0.5" },
+                        "\u5E74\u5229 ",
+                        debt.apr,
+                        "% \u30FB \u6BCE\u6708 ",
+                        yen(debt.minPayment)))),
+            React.createElement("div", { className: "text-right shrink-0" },
+                React.createElement("p", { className: "text-lg font-bold text-[color:var(--ink)]" }, yen(debt.balance)),
+                React.createElement("p", { className: "text-xs text-[color:var(--muted)]" }, payoffMonth !== undefined
+                    ? `${payoffLabel(payoffMonth)}完済`
+                    : "予算を増やすと見えてきます"))),
+        React.createElement("div", { className: "mt-3 h-2.5 bg-[color:var(--mint-bg)] rounded-full overflow-hidden" },
+            React.createElement("div", { className: "h-full rounded-full transition-all duration-700", style: {
+                    width: `${progress}%`,
+                    background: "linear-gradient(90deg,var(--mint),var(--mint-light))",
+                } })),
+        React.createElement("p", { className: "text-xs text-[color:var(--mint-ink)] mt-1" }, progress >= 1
+            ? `${Math.round(progress)}% 返済できました`
+            : "ここからスタート!"),
+        debt.nextDueDate && (React.createElement("div", { className: `mt-3 flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs ${dueStatus === "overdue"
+                ? "bg-[color:var(--danger-bg)] text-[color:var(--danger)]"
+                : dueStatus === "soon"
+                    ? "bg-[color:var(--warn-bg)] text-[color:var(--warn-ink)]"
+                    : "bg-[color:var(--grey-bg)] text-[color:var(--muted)]"}` },
+            React.createElement(Calendar, { size: 13 }),
+            "\u6B21\u56DE ",
+            formatDate(debt.nextDueDate),
+            dueStatus === "overdue" && `(${Math.abs(daysLeft)}日 遅れています)`,
+            dueStatus === "soon" &&
+                (daysLeft === 0 ? "(今日です!)" : `(あと${daysLeft}日)`),
+            (debt.payMethod || debt.account) && (React.createElement("span", { className: "ml-auto shrink-0 pl-2" }, [debt.payMethod, debt.account].filter(Boolean).join(" / "))))),
+        paying ? (React.createElement("div", { className: "mt-3 flex items-center gap-2" },
+            React.createElement("input", { type: "number", autoFocus: true, value: amount, onChange: (e) => setAmount(e.target.value), placeholder: "\u8FD4\u6E08\u3057\u305F\u91D1\u984D", className: `${inputCls} flex-1` }),
+            React.createElement("button", { onClick: submitPay, className: "px-4 py-2.5 rounded-full text-sm font-medium bg-[color:var(--mint)] hover:bg-[color:var(--mint-hover)] text-[color:var(--on-accent)]" }, "\u8A18\u9332"),
+            React.createElement("button", { onClick: () => setPaying(false), className: "p-2 rounded-full text-[color:var(--muted)] hover:bg-[color:var(--grey-bg)]", "aria-label": "\u30AD\u30E3\u30F3\u30BB\u30EB" },
+                React.createElement(X, { size: 16 })))) : (React.createElement("div", { className: "mt-3 flex items-center justify-between" },
+            React.createElement("button", { onClick: openPay, className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] shadow-sm flex items-center gap-1.5" },
+                React.createElement(Check, { size: 15 }),
+                " \u8FD4\u6E08\u3057\u305F!"),
+            React.createElement("div", { className: "flex items-center gap-1" },
+                React.createElement("button", { onClick: () => onEdit(debt), className: "p-2 rounded-full text-[color:var(--muted)] hover:bg-[color:var(--grey-bg)]", "aria-label": "\u7DE8\u96C6" },
+                    React.createElement(Pencil, { size: 15 })),
+                React.createElement("button", { onClick: () => onDelete(debt.id), className: "p-2 rounded-full text-[color:var(--muted)] hover:bg-[color:var(--danger-bg)] hover:text-[color:var(--danger)]", "aria-label": "\u524A\u9664" },
+                    React.createElement(Trash2, { size: 15 })))))));
+}
+/* ------------------------------------------------------------------ */
+/* メイン                                                              */
+/* ------------------------------------------------------------------ */
+function GateScreen({ conn, error, onSubmitPass, onRetry }) {
+    const [pass, setPassVal] = useState("");
+    return (React.createElement("div", { className: "pt-16 pb-24 max-w-sm mx-auto text-center text-[color:var(--ink)]" },
+        React.createElement("div", { className: "w-14 h-14 rounded-full bg-[color:var(--cream2)] text-[color:var(--coral-ink)] flex items-center justify-center mx-auto mb-4" },
+            React.createElement(Rocket, { size: 26 })),
+        React.createElement("h1", { className: "text-xl font-bold mb-1" }, "\u8FD4\u6E08\u30ED\u30FC\u30C9\u30DE\u30C3\u30D7"),
+        conn === "loading" && (React.createElement("p", { className: "text-sm text-[color:var(--muted)] mt-4" }, "\u30B9\u30D7\u30EC\u30C3\u30C9\u30B7\u30FC\u30C8\u304B\u3089\u8AAD\u307F\u8FBC\u3093\u3067\u3044\u307E\u3059\u2026")),
+        conn === "needsUrl" && (React.createElement("p", { className: "text-sm text-[color:var(--muted)] mt-4 leading-relaxed" },
+            "\u307E\u3060\u4FDD\u5B58\u5148\u304C\u3064\u306A\u304C\u3063\u3066\u3044\u307E\u305B\u3093\u3002",
+            React.createElement("br", null),
+            "index.html \u306E GAS_URL \u306B\u3001Apps Script\u306E\u30A6\u30A7\u30D6\u30A2\u30D7\u30EA\u306EURL\u3092\u8CBC\u3063\u3066\u304F\u3060\u3055\u3044\u3002")),
+        conn === "needsPass" && (React.createElement("form", { className: "mt-4 space-y-3", onSubmit: (e) => {
+                e.preventDefault();
+                if (pass.trim())
+                    onSubmitPass(pass.trim());
+            } },
+            React.createElement("p", { className: "text-sm text-[color:var(--muted)]" }, "\u5408\u8A00\u8449\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044\u3002"),
+            React.createElement("input", { type: "password", autoFocus: true, value: pass, onChange: (e) => setPassVal(e.target.value), placeholder: "\u5408\u8A00\u8449", autoComplete: "current-password", className: "w-full bg-[color:var(--card)] border-2 border-[color:var(--line)] rounded-xl px-3 py-2.5 text-sm text-center text-[color:var(--ink)] placeholder-[color:var(--faint)] focus:outline-none focus:border-[color:var(--coral)]" }),
+            React.createElement("button", { type: "submit", className: "w-full py-2.5 rounded-full text-sm font-medium bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] shadow-sm" }, "\u958B\u304F"))),
+        conn === "error" && (React.createElement("button", { onClick: onRetry, className: "mt-4 px-5 py-2.5 rounded-full text-sm font-medium bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] shadow-sm" }, "\u3082\u3046\u4E00\u5EA6\u8AAD\u307F\u8FBC\u3080")),
+        error && conn !== "loading" && (React.createElement("p", { className: "text-sm text-[color:var(--danger)] mt-4" }, error))));
+}
+function DebtRepaymentPlanner() {
+    var _a, _b;
+    const [debts, setDebts] = useState([]);
+    const [strategy, setStrategy] = useState("avalanche");
+    const [monthlyBudget, setMonthlyBudget] = useState(30000);
+    const [bonusEnabled, setBonusEnabled] = useState(false);
+    const [bonusAmount, setBonusAmount] = useState(50000);
+    const [bonusMonth1, setBonusMonth1] = useState(6);
+    const [bonusMonth2, setBonusMonth2] = useState(12);
+    const [loaded, setLoaded] = useState(false);
+    const [showForm, setShowForm] = useState(false);
+    const [editingDebt, setEditingDebt] = useState(null);
+    const [showStrategyInfo, setShowStrategyInfo] = useState(false);
+    const [toast, setToast] = useState(null);
+    const [motivationIdx, setMotivationIdx] = useState(() => Math.floor(Math.random() * MOTIVATIONS.length));
+    const [conn, setConn] = useState(GAS_URL ? (getPass() ? "loading" : "needsPass") : "needsUrl");
+    const [connError, setConnError] = useState("");
+    const [saveState, setSaveState] = useState("saved");
+    const [retryTick, setRetryTick] = useState(0);
+    const lastSaved = useRef("");
+    const writeChain = useRef(Promise.resolve());
+    // スプレッドシートから読み込む
+    const loadFromSheet = async () => {
+        setConn("loading");
+        setConnError("");
+        try {
+            const r = await callApi("load", {});
+            if (!r.ok) {
+                if (r.error === "auth") {
+                    clearPass();
+                    setConnError("合言葉が違います。もう一度入力してください。");
+                    setConn("needsPass");
+                    return;
+                }
+                if (r.error === "passcode_not_set") {
+                    setConnError("合言葉がまだ設定されていません。Apps Scriptの「スクリプト プロパティ」に、PASSCODE を10文字以上で追加してください。");
+                    setConn("error");
+                    return;
+                }
+                throw new Error(r.error || "load_failed");
+            }
+            const st = r.settings || {};
+            const loadedDebts = (r.debts || []).map((d) => ({
+                id: d.id,
+                name: d.name,
+                balance: Number(d.balance) || 0,
+                startingBalance: Math.max(Number(d.startingBalance) || 0, Number(d.balance) || 0),
+                apr: Number(d.apr) || 0,
+                minPayment: Number(d.minPayment) || 0,
+                nextDueDate: d.nextDueDate || "",
+                payMethod: d.payMethod || "",
+                account: d.account || "",
+            }));
+            const loaded = {
+                debts: loadedDebts,
+                strategy: st.strategy === "snowball" ? "snowball" : "avalanche",
+                monthlyBudget: Number.isFinite(Number(st.monthlyBudget)) ? Number(st.monthlyBudget) : 30000,
+                bonusEnabled: st.bonusEnabled === true,
+                bonusAmount: Number.isFinite(Number(st.bonusAmount)) ? Number(st.bonusAmount) : 50000,
+                bonusMonth1: Number(st.bonusMonth1) || 6,
+                bonusMonth2: Number(st.bonusMonth2) || 12,
+            };
+            lastSaved.current = JSON.stringify(loaded);
+            setDebts(loaded.debts);
+            setStrategy(loaded.strategy);
+            setMonthlyBudget(loaded.monthlyBudget);
+            setBonusEnabled(loaded.bonusEnabled);
+            setBonusAmount(loaded.bonusAmount);
+            setBonusMonth1(loaded.bonusMonth1);
+            setBonusMonth2(loaded.bonusMonth2);
+            setSaveState("saved");
+            setConn("ready");
+        }
+        catch (e) {
+            setConnError("スプレッドシートに接続できませんでした。電波と、index.html の GAS_URL を確認してください。");
+            setConn("error");
+        }
+    };
+    useEffect(() => {
+        if (GAS_URL && getPass())
+            loadFromSheet();
+    }, []);
+    // 保存: 入力が落ち着いてから、まとめてスプレッドシートへ書き込む
+    useEffect(() => {
+        if (conn !== "ready")
+            return;
+        const payload = JSON.stringify({
+            debts,
+            strategy,
+            monthlyBudget,
+            bonusEnabled,
+            bonusAmount,
+            bonusMonth1,
+            bonusMonth2,
+        });
+        if (payload === lastSaved.current)
+            return;
+        setSaveState("saving");
+        const t = setTimeout(() => {
+            writeChain.current = writeChain.current.then(async () => {
+                try {
+                    const r = await callApi("save", {
+                        state: {
+                            debts,
+                            settings: { strategy, monthlyBudget, bonusEnabled, bonusAmount, bonusMonth1, bonusMonth2 },
+                        },
+                    });
+                    if (!r.ok)
+                        throw new Error(r.error || "save_failed");
+                    lastSaved.current = payload;
+                    setSaveState("saved");
+                }
+                catch (e) {
+                    setSaveState("failed");
+                }
+            });
+        }, 800);
+        return () => clearTimeout(t);
+    }, [
+        debts,
+        strategy,
+        monthlyBudget,
+        bonusEnabled,
+        bonusAmount,
+        bonusMonth1,
+        bonusMonth2,
+        conn,
+        retryTick,
+    ]);
+    // ---- バックアップ ----
+    const [backupMsg, setBackupMsg] = useState("");
+    const [backupBusy, setBackupBusy] = useState(false);
+    const [backupList, setBackupList] = useState(null);
+    const [pendingFile, setPendingFile] = useState(null);
+    const [pendingRow, setPendingRow] = useState(null);
+    const fileInputRef = useRef(null);
+    const applyState = (nextDebts, nextSettings) => {
+        setDebts(nextDebts);
+        setStrategy(nextSettings.strategy);
+        setMonthlyBudget(nextSettings.monthlyBudget);
+        setBonusEnabled(nextSettings.bonusEnabled);
+        setBonusAmount(nextSettings.bonusAmount);
+        setBonusMonth1(nextSettings.bonusMonth1);
+        setBonusMonth2(nextSettings.bonusMonth2);
+    };
+    const downloadBackup = () => {
+        const data = {
+            appName: "返済ロードマップ",
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            debts: debts,
+            settings: { strategy, monthlyBudget, bonusEnabled, bonusAmount, bonusMonth1, bonusMonth2 },
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "shakkin-backup_" + toISODate(new Date()) + ".json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setBackupMsg("バックアップのファイルを保存しました。");
+    };
+    const onPickFile = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!file)
+            return;
+        setPendingRow(null);
+        try {
+            const data = JSON.parse(await file.text());
+            if (!data || data.appName !== "返済ロードマップ" || !Array.isArray(data.debts)) {
+                setPendingFile(null);
+                setBackupMsg("このファイルは、返済ロードマップのバックアップではないようです。");
+                return;
+            }
+            setPendingFile({
+                fileName: file.name,
+                exportedAt: data.exportedAt ? String(data.exportedAt).slice(0, 16).replace("T", " ") : "",
+                debts: normalizeDebts(data.debts),
+                settings: normalizeSettings(data.settings),
+            });
+            setBackupMsg("");
+        }
+        catch (err) {
+            setPendingFile(null);
+            setBackupMsg("ファイルを読み込めませんでした。");
+        }
+    };
+    const confirmFileRestore = async () => {
+        if (!pendingFile)
+            return;
+        setBackupBusy(true);
+        try {
+            // 戻す前の今の状態を、スプレッドシートに控えとして残す
+            const snap = await callApi("snapshot", {});
+            if (!snap.ok)
+                throw new Error(snap.error || "snapshot_failed");
+            applyState(pendingFile.debts, pendingFile.settings);
+            setPendingFile(null);
+            setBackupMsg("ファイルの内容に置き換えました。(置き換える前の状態も、スプレッドシートに控えとして残してあります)");
+        }
+        catch (err) {
+            setBackupMsg("置き換えの前に控えを取れなかったので、やめておきました。通信を確認してください。");
+        }
+        setBackupBusy(false);
+    };
+    const showBackups = async () => {
+        setBackupBusy(true);
+        setPendingFile(null);
+        setPendingRow(null);
+        try {
+            const r = await callApi("backups", {});
+            if (!r.ok)
+                throw new Error(r.error || "backups_failed");
+            setBackupList(r.backups || []);
+            setBackupMsg((r.backups || []).length ? "" : "まだ控えはありません。");
+        }
+        catch (err) {
+            setBackupMsg("控えの一覧を読み込めませんでした。");
+        }
+        setBackupBusy(false);
+    };
+    const takeSnapshotNow = async () => {
+        setBackupBusy(true);
+        try {
+            const r = await callApi("snapshot", {});
+            if (!r.ok)
+                throw new Error(r.error || "snapshot_failed");
+            setBackupMsg(r.taken ? "今の状態を、スプレッドシートに控えとして残しました。" : "控えは残せませんでした。");
+            if (backupList) {
+                const l = await callApi("backups", {});
+                if (l.ok)
+                    setBackupList(l.backups || []);
+            }
+        }
+        catch (err) {
+            setBackupMsg("控えを残せませんでした。通信を確認してください。");
+        }
+        setBackupBusy(false);
+    };
+    const confirmSheetRestore = async () => {
+        if (!pendingRow)
+            return;
+        setBackupBusy(true);
+        try {
+            const r = await callApi("restore", { row: pendingRow.row, at: pendingRow.at });
+            if (!r.ok)
+                throw new Error(r.error || "restore_failed");
+            applyState(normalizeDebts(r.state.debts), normalizeSettings(r.state.settings));
+            setPendingRow(null);
+            setBackupList(null);
+            setBackupMsg(pendingRow.at.slice(0, 16) + " の状態に戻しました。(戻す前の状態も、控えとして残してあります)");
+        }
+        catch (err) {
+            setBackupMsg("戻せませんでした。もう一度、控えの一覧を開き直してください。");
+            setPendingRow(null);
+        }
+        setBackupBusy(false);
+    };
+    useEffect(() => {
+        if (!toast)
+            return;
+        const t = setTimeout(() => setToast(null), 3500);
+        return () => clearTimeout(t);
+    }, [toast]);
+    const activeDebts = useMemo(() => debts.filter((d) => d.balance > 0), [debts]);
+    const clearedDebts = useMemo(() => debts.filter((d) => d.balance <= 0), [debts]);
+    const orderedDebts = useMemo(() => sortDebts(activeDebts, strategy), [activeDebts, strategy]);
+    const bonus = useMemo(() => ({
+        enabled: bonusEnabled,
+        amount: bonusAmount,
+        months: [bonusMonth1, bonusMonth2],
+    }), [bonusEnabled, bonusAmount, bonusMonth1, bonusMonth2]);
+    const sim = useMemo(() => simulate(activeDebts, strategy, monthlyBudget, bonus), [activeDebts, strategy, monthlyBudget, bonus]);
+    const otherStrategy = strategy === "avalanche" ? "snowball" : "avalanche";
+    const simOther = useMemo(() => simulate(activeDebts, otherStrategy, monthlyBudget, bonus), [activeDebts, otherStrategy, monthlyBudget, bonus]);
+    const baseBudget = Math.max(monthlyBudget, sim.minSum);
+    const simPlus = useMemo(() => simulate(activeDebts, strategy, baseBudget + 5000, bonus), [activeDebts, strategy, baseBudget, bonus]);
+    const simAvalanche = strategy === "avalanche" ? sim : simOther;
+    const simSnowball = strategy === "snowball" ? sim : simOther;
+    const avalancheFirst = sortDebts(activeDebts, "avalanche")[0];
+    const snowballFirst = sortDebts(activeDebts, "snowball")[0];
+    const interestSavedByAvalanche = simSnowball.totalInterest - simAvalanche.totalInterest;
+    const firstWinDiff = avalancheFirst && snowballFirst
+        ? ((_a = simAvalanche.payoffMonth[avalancheFirst.id]) !== null && _a !== void 0 ? _a : 0) -
+            ((_b = simSnowball.payoffMonth[snowballFirst.id]) !== null && _b !== void 0 ? _b : 0)
+        : 0;
+    const plusMonthsSaved = sim.months - simPlus.months;
+    const plusInterestSaved = sim.totalInterest - simPlus.totalInterest;
+    const totalBalance = activeDebts.reduce((s, d) => s + d.balance, 0);
+    const totalStarting = debts.reduce((s, d) => s + Math.max(d.startingBalance || 0, d.balance), 0);
+    const repaidPercent = totalStarting > 0 ? ((totalStarting - totalBalance) / totalStarting) * 100 : 0;
+    const weightedApr = totalBalance > 0
+        ? activeDebts.reduce((s, d) => s + d.apr * d.balance, 0) / totalBalance
+        : 0;
+    const chartData = useMemo(() => {
+        const step = Math.max(1, Math.floor(sim.history.length / 40));
+        return sim.history.filter((_, i) => i % step === 0 || i === sim.history.length - 1);
+    }, [sim.history]);
+    const reminders = activeDebts
+        .filter((d) => d.nextDueDate)
+        .map((d) => ({ ...d, daysLeft: daysUntil(d.nextDueDate) }))
+        .filter((d) => d.daysLeft <= 3)
+        .sort((a, b) => a.daysLeft - b.daysLeft);
+    const saveDebt = (debt) => {
+        setDebts((prev) => prev.some((d) => d.id === debt.id)
+            ? prev.map((d) => (d.id === debt.id ? debt : d))
+            : [...prev, debt]);
+        setShowForm(false);
+        setEditingDebt(null);
+    };
+    const deleteDebt = (id) => setDebts((prev) => prev.filter((d) => d.id !== id));
+    // 返済を記録。支払予定日があれば自動で翌月に進める
+    const payDebt = (id, amount) => {
+        const target = debts.find((d) => d.id === id);
+        if (!target)
+            return;
+        const paid = Math.min(amount, target.balance);
+        const cleared = target.balance - paid <= 0;
+        setDebts((prev) => prev.map((d) => d.id === id
+            ? {
+                ...d,
+                balance: Math.max(0, d.balance - amount),
+                nextDueDate: d.nextDueDate ? addOneMonth(d.nextDueDate) : "",
+            }
+            : d));
+        callApi("log", {
+            entry: { name: target.name, amount: paid, balanceAfter: Math.max(0, target.balance - paid) },
+        }).catch(() => { });
+        setToast(cleared
+            ? { type: "clear", text: `「${target.name}」を完済しました!おめでとう!` }
+            : { type: "pay", text: `ナイス!${yen(paid)} 返済できました。確実に前進しています。` });
+    };
+    const closeForm = () => {
+        setShowForm(false);
+        setEditingDebt(null);
+    };
+    if (conn !== "ready") {
+        return (React.createElement(GateScreen, { conn: conn, error: connError, onSubmitPass: (p) => {
+                setPass(p);
+                loadFromSheet();
+            }, onRetry: loadFromSheet }));
+    }
+    return (React.createElement("div", { className: "pt-8 pb-24 text-[color:var(--ink)]" },
+        React.createElement("div", { className: "max-w-xl mx-auto" },
+            React.createElement("div", { className: "flex items-center gap-1.5 text-[color:var(--coral-ink)] text-sm font-medium mb-2" },
+                React.createElement(Sparkles, { size: 15 }),
+                " \u4ECA\u65E5\u306E\u3072\u3068\u3053\u3068"),
+            React.createElement("div", { className: "relative bg-[color:var(--card)] rounded-3xl px-5 py-4 shadow-[0_6px_20px_rgba(255,179,71,0.18)] mb-6" },
+                React.createElement("p", { className: "text-lg font-medium leading-relaxed pr-8" }, MOTIVATIONS[motivationIdx]),
+                React.createElement("button", { onClick: () => setMotivationIdx((i) => {
+                        let n = Math.floor(Math.random() * MOTIVATIONS.length);
+                        if (n === i)
+                            n = (n + 1) % MOTIVATIONS.length;
+                        return n;
+                    }), className: "absolute top-3 right-3 p-1.5 rounded-full text-[color:var(--warn-ink)] hover:bg-[color:var(--warn-bg)]", "aria-label": "\u5225\u306E\u30E1\u30C3\u30BB\u30FC\u30B8\u3092\u898B\u308B" },
+                    React.createElement(RefreshCw, { size: 15 }))),
+            React.createElement("div", { className: "flex items-center justify-end gap-2 -mt-3 mb-4 text-xs text-[color:var(--muted)]" },
+                saveState === "saved" && (React.createElement("span", { className: "flex items-center gap-1" },
+                    React.createElement(Check, { size: 13 }),
+                    " \u30B9\u30D7\u30EC\u30C3\u30C9\u30B7\u30FC\u30C8\u306B\u4FDD\u5B58\u6E08\u307F")),
+                saveState === "saving" && React.createElement("span", null, "\u4FDD\u5B58\u3057\u3066\u3044\u307E\u3059\u2026"),
+                saveState === "failed" && (React.createElement("span", { className: "flex items-center gap-2 text-[color:var(--danger)]" },
+                    "\u4FDD\u5B58\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F",
+                    React.createElement("button", { onClick: () => setRetryTick((n) => n + 1), className: "px-2.5 py-1 rounded-full bg-[color:var(--card)] shadow-sm font-medium" }, "\u518D\u8A66\u884C")))),
+            reminders.length > 0 && (React.createElement("div", { className: "bg-[color:var(--warn-bg)] border-2 border-[color:var(--warn-line)] rounded-2xl p-4 mb-6" },
+                React.createElement("p", { className: "text-sm font-medium text-[color:var(--warn-ink)] mb-2 flex items-center gap-1.5" },
+                    React.createElement(Bell, { size: 15 }),
+                    " \u3082\u3046\u3059\u3050\u652F\u6255\u65E5\u3067\u3059"),
+                React.createElement("ul", { className: "space-y-2" }, reminders.map((d) => (React.createElement("li", { key: d.id, className: "flex items-center justify-between gap-2 text-sm" },
+                    React.createElement("span", { className: "min-w-0" },
+                        React.createElement("span", { className: "font-medium" }, d.name),
+                        React.createElement("span", { className: "text-[color:var(--muted)]" },
+                            " ",
+                            "\u30FB",
+                            formatDate(d.nextDueDate)),
+                        React.createElement("span", { className: d.daysLeft < 0 ? "text-[color:var(--danger)]" : "text-[color:var(--warn-ink)]" }, d.daysLeft < 0
+                            ? `(${Math.abs(d.daysLeft)}日遅れ)`
+                            : d.daysLeft === 0
+                                ? "(今日)"
+                                : `(あと${d.daysLeft}日)`)),
+                    React.createElement("button", { onClick: () => payDebt(d.id, Math.min(d.minPayment, d.balance)), className: "shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-[color:var(--mint)] hover:bg-[color:var(--mint-hover)] text-[color:var(--on-accent)]" },
+                        yen(Math.min(d.minPayment, d.balance)),
+                        " \u6255\u3063\u305F"))))))),
+            debts.length === 0 ? (React.createElement("div", { className: "bg-[color:var(--card)] rounded-3xl p-8 text-center shadow-[0_6px_20px_rgba(255,122,89,0.12)]" },
+                React.createElement("div", { className: "w-14 h-14 rounded-full bg-[color:var(--cream2)] text-[color:var(--coral-ink)] flex items-center justify-center mx-auto mb-3" },
+                    React.createElement(Rocket, { size: 26 })),
+                React.createElement("p", { className: "text-lg font-medium mb-1" }, "\u307E\u305A\u306F\u501F\u91D1\u3092\u767B\u9332\u3057\u307E\u3057\u3087\u3046"),
+                React.createElement("p", { className: "text-sm text-[color:var(--muted)] mb-5 leading-relaxed" },
+                    "\u6B8B\u9AD8\u30FB\u5E74\u5229\u30FB\u6BCE\u6708\u306E\u8FD4\u6E08\u984D\u3092\u5165\u308C\u308B\u3060\u3051\u3002",
+                    React.createElement("br", null),
+                    "\u8FD4\u3059\u9806\u756A\u3068\u5B8C\u6E08\u306E\u6642\u671F\u304C\u898B\u3048\u3066\u304D\u307E\u3059\u3002"),
+                React.createElement("button", { onClick: () => setShowForm(true), className: "inline-flex items-center gap-1.5 px-6 py-3 rounded-full bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] font-medium shadow-md" },
+                    React.createElement(Plus, { size: 18 }),
+                    " \u306F\u3058\u3081\u308B"))) : (React.createElement(React.Fragment, null,
+                React.createElement("div", { className: "flex items-center justify-between mb-3" },
+                    React.createElement("h2", { className: "text-base font-bold" }, "\u8FD4\u6E08\u306E\u512A\u5148\u9806\u4F4D"),
+                    React.createElement("button", { onClick: () => {
+                            setEditingDebt(null);
+                            setShowForm(true);
+                        }, className: "flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-[color:var(--card)] text-[color:var(--coral-ink)] shadow-sm hover:bg-[color:var(--cream2)]" },
+                        React.createElement(Plus, { size: 14 }),
+                        " \u8FFD\u52A0")),
+                orderedDebts.length > 0 ? (React.createElement("div", { className: "space-y-3 mb-6" }, orderedDebts.map((debt, i) => (React.createElement(DebtCard, { key: debt.id, debt: debt, order: i + 1, payoffMonth: sim.payoffMonth[debt.id], onEdit: (d) => {
+                        setEditingDebt(d);
+                        setShowForm(true);
+                    }, onDelete: deleteDebt, onPay: payDebt }))))) : (React.createElement("div", { className: "bg-[color:var(--card)] rounded-2xl p-6 text-center mb-6" },
+                    React.createElement(PartyPopper, { className: "mx-auto text-[color:var(--coral-ink)] mb-2", size: 28 }),
+                    React.createElement("p", { className: "font-medium" }, "\u3059\u3079\u3066\u5B8C\u6E08\u3057\u307E\u3057\u305F!"),
+                    React.createElement("p", { className: "text-sm text-[color:var(--muted)] mt-1" }, "\u672C\u5F53\u306B\u304A\u75B2\u308C\u3055\u307E\u3067\u3057\u305F\u3002"))),
+                React.createElement("div", { className: "bg-[color:var(--card)] rounded-3xl p-5 mb-6 shadow-[0_6px_20px_rgba(255,179,71,0.15)]" },
+                    React.createElement("div", { className: "flex items-center gap-5" },
+                        React.createElement(ProgressRing, { percent: repaidPercent }),
+                        React.createElement("div", { className: "min-w-0" },
+                            React.createElement("p", { className: "text-xs text-[color:var(--muted)]" }, "\u3044\u307E\u306E\u501F\u91D1\u306E\u5408\u8A08"),
+                            React.createElement("p", { className: "text-2xl font-bold" }, yen(totalBalance)),
+                            React.createElement("p", { className: "text-xs text-[color:var(--muted)] mt-3" }, "\u5B8C\u6E08\u306E\u76EE\u5B89"),
+                            React.createElement("p", { className: "text-base font-bold text-[color:var(--coral-ink)]" }, activeDebts.length === 0
+                                ? "完済!"
+                                : payoffLabel(sim.months)),
+                            activeDebts.length > 0 && (React.createElement("p", { className: "text-xs text-[color:var(--muted)]" },
+                                "\u3042\u3068 ",
+                                durationLabel(sim.months))))),
+                    React.createElement("div", { className: "grid grid-cols-2 gap-3 mt-5" },
+                        React.createElement("div", { className: "bg-[color:var(--cream1)] rounded-2xl p-3" },
+                            React.createElement("p", { className: "text-xs text-[color:var(--muted)]" }, "\u6255\u3046\u5229\u606F\u306E\u5408\u8A08"),
+                            React.createElement("p", { className: "text-base font-bold" }, yen(sim.totalInterest))),
+                        React.createElement("div", { className: "bg-[color:var(--sky-bg)] rounded-2xl p-3" },
+                            React.createElement("p", { className: "text-xs text-[color:var(--muted)]" }, "\u5E73\u5747\u306E\u5E74\u5229"),
+                            React.createElement("p", { className: "text-base font-bold" },
+                                weightedApr.toFixed(1),
+                                "%"))),
+                    bonusEnabled && sim.totalBonusPaid > 0 && (React.createElement("p", { className: "text-xs text-[color:var(--mint-ink)] mt-3" },
+                        "\u30DC\u30FC\u30CA\u30B9\u8FD4\u6E08\u3067 ",
+                        yen(sim.totalBonusPaid),
+                        " \u3092\u524D\u5012\u3057\u3067\u304D\u307E\u3059"))),
+                React.createElement("div", { className: "bg-[color:var(--card)] rounded-3xl p-5 mb-6 shadow-[0_6px_20px_rgba(255,122,89,0.10)] space-y-4" },
+                    React.createElement("h2", { className: "text-base font-bold" }, "\u8FD4\u6E08\u30D7\u30E9\u30F3"),
+                    React.createElement("div", null,
+                        React.createElement("div", { className: "flex items-center justify-between mb-2" },
+                            React.createElement("span", { className: "text-sm flex items-center gap-1" },
+                                "\u8FD4\u3059\u9806\u756A",
+                                React.createElement("button", { onClick: () => setShowStrategyInfo((v) => !v), className: "text-[color:var(--faint)] hover:text-[color:var(--coral-ink)]", "aria-label": "\u8FD4\u6E08\u65B9\u5F0F\u306E\u8AAC\u660E" },
+                                    React.createElement(Info, { size: 15 })))),
+                        React.createElement("div", { className: "grid grid-cols-2 gap-2 bg-[color:var(--cream1)] rounded-full p-1" },
+                            React.createElement("button", { onClick: () => setStrategy("avalanche"), className: `py-2 rounded-full text-xs font-medium transition-colors ${strategy === "avalanche"
+                                    ? "bg-[color:var(--coral)] text-[color:var(--on-accent)] shadow-sm"
+                                    : "text-[color:var(--muted)]"}` }, "\u91D1\u5229\u304C\u9AD8\u3044\u9806(\u96EA\u5D29\u5F0F)"),
+                            React.createElement("button", { onClick: () => setStrategy("snowball"), className: `py-2 rounded-full text-xs font-medium transition-colors ${strategy === "snowball"
+                                    ? "bg-[color:var(--coral)] text-[color:var(--on-accent)] shadow-sm"
+                                    : "text-[color:var(--muted)]"}` }, "\u6B8B\u9AD8\u304C\u5C11\u306A\u3044\u9806(\u96EA\u3060\u308B\u307E\u5F0F)")),
+                        showStrategyInfo && (React.createElement("div", { className: "mt-3 bg-[color:var(--cream1)] rounded-2xl p-3 text-xs leading-relaxed space-y-1.5" },
+                            React.createElement("p", null,
+                                React.createElement("span", { className: "font-bold text-[color:var(--coral-ink)]" }, "\u96EA\u5D29\u5F0F:"),
+                                "\u91D1\u5229\u304C\u9AD8\u3044\u501F\u91D1\u304B\u3089\u8FD4\u3059\u65B9\u6CD5\u3002\u6255\u3046\u5229\u606F\u306E\u5408\u8A08\u3092\u3044\u3061\u3070\u3093\u6291\u3048\u3089\u308C\u307E\u3059\u3002"),
+                            React.createElement("p", null,
+                                React.createElement("span", { className: "font-bold text-[color:var(--coral-ink)]" }, "\u96EA\u3060\u308B\u307E\u5F0F:"),
+                                "\u6B8B\u9AD8\u304C\u5C11\u306A\u3044\u501F\u91D1\u304B\u3089\u8FD4\u3059\u65B9\u6CD5\u3002\u65E9\u304F1\u4EF6\u3092\u5B8C\u6E08\u3067\u304D\u3066\u3001\u9054\u6210\u611F\u3092\u5F97\u3084\u3059\u3044\u65B9\u6CD5\u3067\u3059\u3002")))),
+                    React.createElement("div", { className: "flex items-center justify-between gap-3" },
+                        React.createElement("span", { className: "text-sm whitespace-nowrap" }, "\u6BCE\u6708\u306E\u8FD4\u6E08\u4E88\u7B97"),
+                        React.createElement("input", { type: "number", value: monthlyBudget, onChange: (e) => setMonthlyBudget(parseFloat(e.target.value) || 0), className: `${inputCls} !w-40 text-right` })),
+                    sim.shortfall && (React.createElement("p", { className: "text-xs text-[color:var(--danger)]" },
+                        "\u4E88\u7B97\u304C\u6BCE\u6708\u306E\u8FD4\u6E08\u984D\u306E\u5408\u8A08(",
+                        yen(sim.minSum),
+                        ")\u3088\u308A\u5C11\u306A\u3044\u305F\u3081\u3001\u305D\u306E\u91D1\u984D\u3067\u8A08\u7B97\u3057\u3066\u3044\u307E\u3059\u3002")),
+                    React.createElement("div", { className: "border-t-2 border-dashed border-[color:var(--line)] pt-4" },
+                        React.createElement("label", { className: "flex items-center gap-2 text-sm cursor-pointer" },
+                            React.createElement("input", { type: "checkbox", checked: bonusEnabled, onChange: (e) => setBonusEnabled(e.target.checked), className: "w-4 h-4 accent-[color:var(--coral)]" }),
+                            "\u30DC\u30FC\u30CA\u30B9\u3067\u3082\u8FD4\u6E08\u3059\u308B(\u5E742\u56DE)"),
+                        bonusEnabled && (React.createElement("div", { className: "mt-3 space-y-3" },
+                            React.createElement("div", { className: "flex items-center justify-between gap-3" },
+                                React.createElement("span", { className: "text-sm whitespace-nowrap" }, "1\u56DE\u3042\u305F\u308A"),
+                                React.createElement("input", { type: "number", value: bonusAmount, onChange: (e) => setBonusAmount(parseFloat(e.target.value) || 0), className: `${inputCls} !w-40 text-right` })),
+                            React.createElement("div", { className: "flex items-center justify-between gap-3" },
+                                React.createElement("span", { className: "text-sm whitespace-nowrap" }, "\u8FD4\u6E08\u3059\u308B\u6708"),
+                                React.createElement("div", { className: "flex gap-2" }, [
+                                    [bonusMonth1, setBonusMonth1],
+                                    [bonusMonth2, setBonusMonth2],
+                                ].map(([val, set], idx) => (React.createElement("select", { key: idx, value: val, onChange: (e) => set(parseInt(e.target.value, 10)), className: "bg-[color:var(--card)] border-2 border-[color:var(--line)] rounded-xl px-2 py-2 text-sm focus:outline-none focus:border-[color:var(--coral)]" }, Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (React.createElement("option", { key: m, value: m },
+                                    m,
+                                    "\u6708")))))))))))),
+                activeDebts.length > 0 && (React.createElement("div", { className: "bg-[color:var(--mint-bg)] rounded-3xl p-5 mb-6" },
+                    React.createElement("p", { className: "text-sm font-bold text-[color:var(--mint-ink)] mb-2 flex items-center gap-1.5" },
+                        React.createElement(Lightbulb, { size: 16 }),
+                        " \u8FD4\u6E08\u3092\u30E9\u30AF\u306B\u3059\u308B\u30D2\u30F3\u30C8"),
+                    React.createElement("ul", { className: "text-sm leading-relaxed space-y-2" },
+                        sim.months < SIM_CAP && (plusMonthsSaved > 0 || plusInterestSaved > 1) && (React.createElement("li", null,
+                            "\u6BCE\u6708\u3042\u3068 ",
+                            React.createElement("b", null, "5,000\u5186"),
+                            " \u3060\u3051\u5897\u3084\u305B\u305F\u3089\u3001\u5B8C\u6E08\u304C",
+                            plusMonthsSaved > 0 && (React.createElement(React.Fragment, null,
+                                " ",
+                                React.createElement("b", { className: "text-[color:var(--coral-ink)]" },
+                                    plusMonthsSaved,
+                                    "\u30F6\u6708"),
+                                " \u65E9\u307E\u308A")),
+                            "\u3001\u5229\u606F\u3082 ",
+                            React.createElement("b", { className: "text-[color:var(--coral-ink)]" }, yen(plusInterestSaved)),
+                            " ",
+                            "\u6E1B\u3089\u305B\u307E\u3059\u3002")),
+                        activeDebts.length >= 2 && interestSavedByAvalanche > 1 && (React.createElement("li", null,
+                            "\u91D1\u5229\u304C\u9AD8\u3044\u9806(\u96EA\u5D29\u5F0F)\u306A\u3089\u3001\u6B8B\u9AD8\u304C\u5C11\u306A\u3044\u9806\u3088\u308A\u5229\u606F\u3092\u7D04",
+                            " ",
+                            React.createElement("b", { className: "text-[color:var(--coral-ink)]" }, yen(interestSavedByAvalanche)),
+                            " ",
+                            "\u6291\u3048\u3089\u308C\u307E\u3059\u3002")),
+                        activeDebts.length >= 2 && firstWinDiff > 0 && (React.createElement("li", null,
+                            "\u6B8B\u9AD8\u304C\u5C11\u306A\u3044\u9806(\u96EA\u3060\u308B\u307E\u5F0F)\u306A\u3089\u3001\u6700\u521D\u306E1\u4EF6\u3092\u7D04",
+                            " ",
+                            React.createElement("b", { className: "text-[color:var(--coral-ink)]" },
+                                firstWinDiff,
+                                "\u30F6\u6708"),
+                            " ",
+                            "\u65E9\u304F\u5B8C\u6E08\u3067\u304D\u3001\u9054\u6210\u611F\u3092\u5473\u308F\u3048\u307E\u3059\u3002")),
+                        activeDebts.length >= 2 && (React.createElement("li", { className: "text-[color:var(--ink)]" }, strategy === "avalanche"
+                            ? "利息を少なくしたいなら、いまの雪崩式のままでOKです。"
+                            : "続けやすさを大事にするなら、いまの雪だるま式のままでOKです。"))))),
+                sim.history.length > 1 && (React.createElement("div", { className: "bg-[color:var(--card)] rounded-3xl p-5 mb-6 shadow-[0_6px_20px_rgba(77,163,255,0.10)]" },
+                    React.createElement("p", { className: "text-base font-bold mb-3" }, "\u501F\u91D1\u304C\u6E1B\u3063\u3066\u3044\u304F\u3088\u3046\u3059"),
+                    React.createElement(TrendChart, { data: chartData }))),
+                clearedDebts.length > 0 && (React.createElement("div", { className: "mb-6" },
+                    React.createElement("p", { className: "text-sm font-bold mb-2 flex items-center gap-1.5" },
+                        React.createElement(PartyPopper, { size: 16, className: "text-[color:var(--coral-ink)]" }),
+                        " \u5B8C\u6E08\u3057\u305F\u501F\u91D1"),
+                    React.createElement("div", { className: "space-y-2" }, clearedDebts.map((d) => (React.createElement("div", { key: d.id, className: "flex items-center justify-between bg-[color:var(--card-soft)] rounded-2xl px-4 py-3" },
+                        React.createElement("span", { className: "text-sm text-[color:var(--muted)] line-through" }, d.name),
+                        React.createElement("button", { onClick: () => deleteDebt(d.id), className: "p-1.5 rounded-full text-[color:var(--faint)] hover:text-[color:var(--danger)]", "aria-label": "\u524A\u9664" },
+                            React.createElement(Trash2, { size: 14 })))))))))),
+            React.createElement("div", { className: "mt-8 bg-[color:var(--card)] rounded-3xl border-2 border-[color:var(--line)] p-5" },
+                React.createElement("h2", { className: "text-base font-bold text-[color:var(--ink)] mb-1" }, "\u30D0\u30C3\u30AF\u30A2\u30C3\u30D7"),
+                React.createElement("p", { className: "text-xs text-[color:var(--muted)] leading-relaxed mb-4" }, "\u30B9\u30D7\u30EC\u30C3\u30C9\u30B7\u30FC\u30C8\u306B\u306F\u30011\u65E5\u306E\u6700\u521D\u306E\u4FDD\u5B58\u306E\u524D\u306B\u81EA\u52D5\u3067\u63A7\u3048\u304C\u6B8B\u308A\u307E\u3059(\u6700\u65B030\u4EF6)\u3002\u30D5\u30A1\u30A4\u30EB\u306B\u66F8\u304D\u51FA\u3057\u3066\u3001\u624B\u5143\u306B\u7F6E\u304F\u3053\u3068\u3082\u3067\u304D\u307E\u3059\u3002"),
+                React.createElement("div", { className: "flex flex-wrap gap-2" },
+                    React.createElement("button", { onClick: downloadBackup, className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--coral)] hover:bg-[color:var(--coral-hover)] text-[color:var(--on-accent)] shadow-sm" }, "\u30D5\u30A1\u30A4\u30EB\u306B\u66F8\u304D\u51FA\u3059"),
+                    React.createElement("button", { onClick: () => fileInputRef.current && fileInputRef.current.click(), disabled: backupBusy, className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--card)] border-2 border-[color:var(--line)] text-[color:var(--ink)] disabled:opacity-50" }, "\u30D5\u30A1\u30A4\u30EB\u304B\u3089\u623B\u3059"),
+                    React.createElement("button", { onClick: showBackups, disabled: backupBusy, className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--card)] border-2 border-[color:var(--line)] text-[color:var(--ink)] disabled:opacity-50" }, "\u30B9\u30D7\u30EC\u30C3\u30C9\u30B7\u30FC\u30C8\u306E\u63A7\u3048\u3092\u898B\u308B"),
+                    React.createElement("button", { onClick: takeSnapshotNow, disabled: backupBusy, className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--card)] border-2 border-[color:var(--line)] text-[color:var(--ink)] disabled:opacity-50" }, "\u4ECA\u3059\u3050\u63A7\u3048\u3092\u6B8B\u3059"),
+                    React.createElement("input", { ref: fileInputRef, type: "file", accept: "application/json,.json", onChange: onPickFile, className: "hidden" })),
+                backupMsg && (React.createElement("p", { className: "mt-3 text-sm text-[color:var(--ink)] bg-[color:var(--cream1)] rounded-xl px-3 py-2", role: "status" }, backupMsg)),
+                pendingFile && (React.createElement("div", { className: "mt-3 rounded-2xl bg-[color:var(--warn-bg)] border border-[color:var(--warn-line)] p-4" },
+                    React.createElement("p", { className: "text-sm text-[color:var(--warn-ink)] font-medium mb-1" }, "\u3053\u306E\u5185\u5BB9\u306B\u7F6E\u304D\u63DB\u3048\u307E\u3059\u304B?"),
+                    React.createElement("p", { className: "text-xs text-[color:var(--ink)] leading-relaxed mb-3" },
+                        pendingFile.fileName,
+                        pendingFile.exportedAt ? "(" + pendingFile.exportedAt + " に書き出し)" : "",
+                        React.createElement("br", null),
+                        "\u501F\u91D1 ",
+                        pendingFile.debts.length,
+                        " \u4EF6\u3002\u4ECA\u306E\u30C7\u30FC\u30BF\u306F\u3001\u3053\u306E\u5185\u5BB9\u3067\u7F6E\u304D\u63DB\u308F\u308A\u307E\u3059\u3002"),
+                    React.createElement("div", { className: "flex gap-2" },
+                        React.createElement("button", { onClick: confirmFileRestore, disabled: backupBusy, className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--coral)] text-[color:var(--on-accent)] disabled:opacity-50" }, "\u7F6E\u304D\u63DB\u3048\u308B"),
+                        React.createElement("button", { onClick: () => setPendingFile(null), className: "px-4 py-2 rounded-full text-sm font-medium bg-[color:var(--card)] border-2 border-[color:var(--line)] text-[color:var(--ink)]" }, "\u3084\u3081\u308B")))),
+                backupList && backupList.length > 0 && (React.createElement("ul", { className: "mt-3 rounded-2xl border border-[color:var(--line)] overflow-hidden" }, backupList.map((b) => (React.createElement("li", { key: b.row + b.at, className: "px-3 py-2.5 bg-[color:var(--card)] border-b border-[color:var(--line)] last:border-b-0" },
+                    React.createElement("div", { className: "flex items-center justify-between gap-2" },
+                        React.createElement("span", { className: "text-sm text-[color:var(--ink)]" },
+                            String(b.at).slice(0, 16),
+                            React.createElement("span", { className: "text-xs text-[color:var(--muted)] ml-2" },
+                                "\u501F\u91D1 ",
+                                b.count,
+                                " \u4EF6")),
+                        React.createElement("button", { onClick: () => setPendingRow(b), disabled: backupBusy, className: "px-3 py-1.5 rounded-full text-xs font-medium bg-[color:var(--card)] border-2 border-[color:var(--line)] text-[color:var(--ink)] disabled:opacity-50" }, "\u3053\u306E\u6642\u70B9\u306B\u623B\u3059")),
+                    pendingRow && pendingRow.row === b.row && pendingRow.at === b.at && (React.createElement("div", { className: "mt-2 rounded-xl bg-[color:var(--warn-bg)] border border-[color:var(--warn-line)] p-3" },
+                        React.createElement("p", { className: "text-xs text-[color:var(--ink)] mb-2" },
+                            String(b.at).slice(0, 16),
+                            " \u306E\u72B6\u614B\u306B\u623B\u3057\u307E\u3059\u3002\u4ECA\u306E\u30C7\u30FC\u30BF\u306F\u3001\u623B\u3059\u524D\u306B\u63A7\u3048\u3068\u3057\u3066\u6B8B\u3057\u307E\u3059\u3002"),
+                        React.createElement("div", { className: "flex gap-2" },
+                            React.createElement("button", { onClick: confirmSheetRestore, disabled: backupBusy, className: "px-3 py-1.5 rounded-full text-xs font-medium bg-[color:var(--coral)] text-[color:var(--on-accent)] disabled:opacity-50" }, "\u623B\u3059"),
+                            React.createElement("button", { onClick: () => setPendingRow(null), className: "px-3 py-1.5 rounded-full text-xs font-medium bg-[color:var(--card)] border-2 border-[color:var(--line)] text-[color:var(--ink)]" }, "\u3084\u3081\u308B"))))))))))),
+        showForm && (React.createElement("div", { className: "fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4", onClick: closeForm },
+            React.createElement("div", { className: "w-full max-w-md max-h-[90vh] overflow-y-auto bg-[color:var(--card)] rounded-3xl p-5 shadow-2xl", onClick: (e) => e.stopPropagation() },
+                React.createElement("div", { className: "flex items-center justify-between mb-4" },
+                    React.createElement("p", { className: "text-base font-bold" }, editingDebt ? "借金を編集" : "借金を追加"),
+                    React.createElement("button", { onClick: closeForm, className: "p-1.5 rounded-full text-[color:var(--muted)] hover:bg-[color:var(--grey-bg)]", "aria-label": "\u9589\u3058\u308B" },
+                        React.createElement(X, { size: 18 }))),
+                React.createElement(DebtForm, { initial: editingDebt, onSave: saveDebt, onCancel: closeForm })))),
+        toast && (React.createElement("div", { className: "fixed bottom-6 left-0 right-0 z-[70] flex justify-center pointer-events-none", style: { paddingLeft: "max(16px, env(safe-area-inset-left, 0px))", paddingRight: "max(16px, env(safe-area-inset-right, 0px))", paddingBottom: "env(safe-area-inset-bottom, 0px)" } },
+            React.createElement("div", { className: `pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-[color:var(--on-accent)] shadow-lg ${toast.type === "clear" ? "bg-[color:var(--coral)]" : "bg-[color:var(--mint)]"}` },
+                toast.type === "clear" ? (React.createElement(PartyPopper, { size: 18 })) : (React.createElement(Check, { size: 18 })),
+                toast.text)))));
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(DebtRepaymentPlanner));
+</script>
+</body>
+</html>
